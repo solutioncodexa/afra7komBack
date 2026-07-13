@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <!-- Include all changelog files -->
+    <include file="db/changelog/changes/001-initial-schema.xml"/>
+    <include file="db/changelog/changes/002-insert-initial-data.xml"/>
+    <include file="db/changelog/changes/003-insert-test-data.xml"/>
+    <include file="db/changelog/changes/004-fix-sequence.xml"/>
+    <include file="db/changelog/changes/006-insert-additional-packs.xml"/>
+    <include file="db/changelog/changes/007-create-gallery-table.xml"/>
+    <include file="db/changelog/changes/008-create-pack-images-table.xml"/>
+    <include file="db/changelog/changes/009-fix-packs-sequence.xml"/>
+    <include file="db/changelog/changes/002-add-reservation-customer-fields.xml"/>
+    <include file="db/changelog/changes/003-add-user-profile-fields.xml"/>
+    <include file="db/changelog/changes/017-create-notifications-table.xml"/>
+    <include file="db/changelog/changes/018-add-type-to-packs.xml"/>
+    <include file="db/changelog/changes/019-create-product-images-table.xml"/>
+    <include file="db/changelog/changes/022-simplify-images-storage.xml"/>
+    <include file="db/changelog/changes/023-add-city-to-reservations.xml"/>
+    <include file="db/changelog/changes/023-add-performance-indexes.xml"/>
+    <include file="db/changelog/changes/024-add-additional-indexes.xml"/>
+    <include file="db/changelog/changes/025-create-contacts-table.xml"/>
+    <include file="db/changelog/changes/026-create-site-settings-table.xml"/>
+<!--    <include file="db/changelog/changes/008-add-audit-logs-columns.xml"/>-->
+
+</databaseChangeLog>

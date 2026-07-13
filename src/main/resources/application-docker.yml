@@ -1,0 +1,133 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://postgres:5432/afra7kom_db
+    username: afra7kom_user
+    password: afra7kom_password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+      pool-name: Afra7komDockerPool
+      auto-commit: false
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 50
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        connection:
+          provider_disables_autocommit: true
+        query:
+          in_clause_parameter_padding: true
+        cache:
+          use_second_level_cache: false
+          use_query_cache: false
+  
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    contexts: docker
+  
+  cache:
+    type: simple
+  
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      enabled: true
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: noreply.codexa@gmail.com
+    password: ggup qcfi rsqj ozyl
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          timeout: 5000
+          connectiontimeout: 5000
+          writetimeout: 5000
+    default-encoding: UTF-8
+
+# JWT Configuration
+jwt:
+  key-file: /app/config/jwt.key
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+# WhatsApp Configuration (Twilio)
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID:your-account-sid}
+  auth-token: ${TWILIO_AUTH_TOKEN:your-auth-token}
+  whatsapp-number: ${TWILIO_WHATSAPP_NUMBER:+1234567890}
+
+# Email Configuration
+app:
+  email:
+    admin: ${ADMIN_EMAIL:admin@afra7kom.com}
+    agent: ${AGENT_EMAIL:agent@afra7kom.com}
+
+# File Upload Configuration
+file:
+  upload-dir: /app/uploads/
+  max-size: -1
+  image:
+    compress: true
+    max-width: 1920
+    max-height: 1920
+    quality: 0.82
+
+minio:
+  enabled: ${MINIO_ENABLED:true}
+  endpoint: ${MINIO_ENDPOINT:http://minio:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:afra7kom}
+  public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+
+# Server Configuration
+server:
+  port: 8080
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    mail:
+      enabled: true
+    redis:
+      enabled: false
+
+# Logging Configuration
+logging:
+  level:
+    com.afra7kom.backend: INFO
+    org.springframework.security: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+

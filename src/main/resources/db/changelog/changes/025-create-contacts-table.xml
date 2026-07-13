@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="025-create-contacts-table" author="system">
+        <createTable tableName="contacts">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="full_name" type="VARCHAR(200)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="email" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="subject" type="VARCHAR(200)"/>
+            
+            <column name="message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="status" type="VARCHAR(50)" defaultValue="NEW">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="is_read" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="replied_by" type="VARCHAR(100)"/>
+            
+            <column name="replied_at" type="TIMESTAMP"/>
+            
+            <column name="reply_message" type="TEXT"/>
+            
+            <column name="whatsapp_url" type="VARCHAR(500)"/>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <!-- Index pour améliorer les performances -->
+        <createIndex tableName="contacts" indexName="idx_contacts_email">
+            <column name="email"/>
+        </createIndex>
+        
+        <createIndex tableName="contacts" indexName="idx_contacts_phone">
+            <column name="phone"/>
+        </createIndex>
+        
+        <createIndex tableName="contacts" indexName="idx_contacts_status">
+            <column name="status"/>
+        </createIndex>
+        
+        <createIndex tableName="contacts" indexName="idx_contacts_is_read">
+            <column name="is_read"/>
+        </createIndex>
+        
+        <createIndex tableName="contacts" indexName="idx_contacts_created_at">
+            <column name="created_at"/>
+        </createIndex>
+        
+        <rollback>
+            <dropTable tableName="contacts"/>
+        </rollback>
+    </changeSet>
+    
+</databaseChangeLog>
+
+
+
+
+

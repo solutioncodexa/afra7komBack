@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="create-notifications-table" author="afra7kom">
+        <createTable tableName="notifications">
+            <column name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="UNREAD">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="reservation_id" type="BIGINT"/>
+            <column name="related_entity_type" type="VARCHAR(50)"/>
+            <column name="related_entity_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_at" type="TIMESTAMP"/>
+            <column name="expires_at" type="TIMESTAMP"/>
+        </createTable>
+        
+        <addCheckConstraint tableName="notifications" 
+                           constraintName="chk_notification_type"
+                           checkCondition="type IN ('RESERVATION_CREATED', 'RESERVATION_CONFIRMED', 'RESERVATION_CANCELLED', 'RESERVATION_MODIFIED', 'PAYMENT_RECEIVED', 'PAYMENT_OVERDUE', 'SYSTEM_ALERT', 'MAINTENANCE_SCHEDULED', 'INVENTORY_LOW', 'USER_ACTION_REQUIRED')"/>
+        
+        <addCheckConstraint tableName="notifications" 
+                           constraintName="chk_notification_status"
+                           checkCondition="status IN ('UNREAD', 'READ', 'ARCHIVED')"/>
+    </changeSet>
+
+    <changeSet id="create-notifications-indexes" author="afra7kom">
+        <createIndex tableName="notifications" indexName="idx_notifications_user_id">
+            <column name="user_id"/>
+        </createIndex>
+        
+        <createIndex tableName="notifications" indexName="idx_notifications_status">
+            <column name="status"/>
+        </createIndex>
+        
+        <createIndex tableName="notifications" indexName="idx_notifications_type">
+            <column name="type"/>
+        </createIndex>
+        
+        <createIndex tableName="notifications" indexName="idx_notifications_created_at">
+            <column name="created_at"/>
+        </createIndex>
+        
+        <createIndex tableName="notifications" indexName="idx_notifications_reservation_id">
+            <column name="reservation_id"/>
+        </createIndex>
+        
+        <createIndex tableName="notifications" indexName="idx_notifications_expires_at">
+            <column name="expires_at"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="add-notifications-comments" author="afra7kom">
+        <sql>
+            COMMENT ON TABLE notifications IS 'Table des notifications utilisateur';
+            COMMENT ON COLUMN notifications.id IS 'Identifiant unique de la notification';
+            COMMENT ON COLUMN notifications.title IS 'Titre de la notification';
+            COMMENT ON COLUMN notifications.message IS 'Message de la notification';
+            COMMENT ON COLUMN notifications.type IS 'Type de notification (RESERVATION_CREATED, etc.)';
+            COMMENT ON COLUMN notifications.status IS 'Statut de la notification (UNREAD, READ, ARCHIVED)';
+            COMMENT ON COLUMN notifications.user_id IS 'ID de l''utilisateur destinataire';
+            COMMENT ON COLUMN notifications.reservation_id IS 'ID de la réservation liée (optionnel)';
+            COMMENT ON COLUMN notifications.related_entity_type IS 'Type d''entité liée (optionnel)';
+            COMMENT ON COLUMN notifications.related_entity_id IS 'ID de l''entité liée (optionnel)';
+            COMMENT ON COLUMN notifications.created_at IS 'Date de création de la notification';
+            COMMENT ON COLUMN notifications.read_at IS 'Date de lecture de la notification';
+            COMMENT ON COLUMN notifications.expires_at IS 'Date d''expiration de la notification (optionnel)';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+
+
+
+
+
+
+
+
+
+

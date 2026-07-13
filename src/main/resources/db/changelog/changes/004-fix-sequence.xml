@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="004-fix-materiels-sequence" author="afra7kom">
+        <!-- Fix the sequence for materiels table to start after existing IDs -->
+        <sql>
+            SELECT setval('materiels_id_seq', (SELECT MAX(id) FROM materiels), true);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

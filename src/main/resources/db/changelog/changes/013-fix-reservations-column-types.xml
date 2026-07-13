@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="013-fix-reservations-column-types" author="afra7kom">
+        <comment>Fix column types in reservations table that were incorrectly created as bytea</comment>
+        
+        <!-- Fix first_name column type -->
+        <sql>
+            ALTER TABLE reservations ALTER COLUMN first_name TYPE VARCHAR(100) USING first_name::text;
+        </sql>
+        
+        <!-- Fix last_name column type -->
+        <sql>
+            ALTER TABLE reservations ALTER COLUMN last_name TYPE VARCHAR(100) USING last_name::text;
+        </sql>
+        
+        <!-- Fix phone column type -->
+        <sql>
+            ALTER TABLE reservations ALTER COLUMN phone TYPE VARCHAR(20) USING phone::text;
+        </sql>
+        
+        <!-- Fix email column type -->
+        <sql>
+            ALTER TABLE reservations ALTER COLUMN email TYPE VARCHAR(255) USING email::text;
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+

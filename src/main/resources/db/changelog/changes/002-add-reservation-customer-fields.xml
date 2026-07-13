@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="002-add-reservation-customer-fields" author="afra7kom">
+        <comment>Ajouter les colonnes pour les informations client dans la table reservations</comment>
+        
+        <!-- Ajouter la colonne first_name -->
+        <addColumn tableName="reservations">
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter la colonne last_name -->
+        <addColumn tableName="reservations">
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter la colonne phone -->
+        <addColumn tableName="reservations">
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter la colonne email -->
+        <addColumn tableName="reservations">
+            <column name="email" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter des commentaires sur les colonnes -->
+        <sql>
+            COMMENT ON COLUMN reservations.first_name IS 'Prénom du client (invité ou connecté)';
+            COMMENT ON COLUMN reservations.last_name IS 'Nom de famille du client (invité ou connecté)';
+            COMMENT ON COLUMN reservations.phone IS 'Numéro de téléphone du client';
+            COMMENT ON COLUMN reservations.email IS 'Adresse email du client (pour les clients connectés)';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+

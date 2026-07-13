@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="008-create-pack-images-table" author="afra7kom">
+        <createTable tableName="pack_images">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="pack_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_pack_images_pack" references="packs(id)"/>
+            </column>
+            <column name="gallery_id" type="BIGINT">
+                <constraints nullable="false" foreignKeyName="fk_pack_images_gallery" references="gallery(id)"/>
+            </column>
+            <column name="sort_order" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <createIndex tableName="pack_images" indexName="idx_pack_images_pack_id">
+            <column name="pack_id"/>
+        </createIndex>
+        
+        <createIndex tableName="pack_images" indexName="idx_pack_images_gallery_id">
+            <column name="gallery_id"/>
+        </createIndex>
+        
+        <createIndex tableName="pack_images" indexName="idx_pack_images_sort_order">
+            <column name="sort_order"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="008b-insert-sample-pack-images" author="afra7kom">
+        <!-- Pack Mariage Complet (ID 1) avec images 1, 2, 3 -->
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="1"/>
+            <column name="gallery_id" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="1"/>
+            <column name="gallery_id" valueNumeric="2"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="1"/>
+            <column name="gallery_id" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="2"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <!-- Pack Naissance (ID 2) avec images 4, 5, 6 -->
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="2"/>
+            <column name="gallery_id" valueNumeric="4"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="2"/>
+            <column name="gallery_id" valueNumeric="5"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="2"/>
+            <column name="gallery_id" valueNumeric="6"/>
+            <column name="sort_order" valueNumeric="2"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <!-- Pack Événement Corporatif (ID 3) avec images 1, 4 -->
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="3"/>
+            <column name="gallery_id" valueNumeric="1"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="3"/>
+            <column name="gallery_id" valueNumeric="4"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <!-- Pack Fête Privée (ID 4) avec images 3, 5 -->
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="4"/>
+            <column name="gallery_id" valueNumeric="3"/>
+            <column name="sort_order" valueNumeric="0"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+        <insert tableName="pack_images">
+            <column name="pack_id" valueNumeric="4"/>
+            <column name="gallery_id" valueNumeric="5"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
+

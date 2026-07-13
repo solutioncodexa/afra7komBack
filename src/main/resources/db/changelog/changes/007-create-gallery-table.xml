@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="007-create-gallery-table" author="afra7kom">
+        <!-- Create gallery table -->
+        <createTable tableName="gallery">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(500)"/>
+            <column name="image_url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alt_text" type="VARCHAR(100)"/>
+            <column name="category" type="VARCHAR(50)"/>
+            <column name="sort_order" type="INTEGER" defaultValueNumeric="0"/>
+            <column name="active" type="BOOLEAN" defaultValueBoolean="true"/>
+            <column name="featured" type="BOOLEAN" defaultValueBoolean="false"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="created_by" type="BIGINT">
+                <constraints foreignKeyName="fk_gallery_user" references="users(id)"/>
+            </column>
+        </createTable>
+
+        <!-- Create index on category for better performance -->
+        <createIndex tableName="gallery" indexName="idx_gallery_category">
+            <column name="category"/>
+        </createIndex>
+
+        <!-- Create index on active status -->
+        <createIndex tableName="gallery" indexName="idx_gallery_active">
+            <column name="active"/>
+        </createIndex>
+
+        <!-- Create index on featured status -->
+        <createIndex tableName="gallery" indexName="idx_gallery_featured">
+            <column name="featured"/>
+        </createIndex>
+
+        <!-- Create index on sort order -->
+        <createIndex tableName="gallery" indexName="idx_gallery_sort_order">
+            <column name="sort_order"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="007b-insert-sample-gallery-images" author="afra7kom">
+        <!-- Insert sample gallery images -->
+        <insert tableName="gallery">
+            <column name="title" value="Mariage Élégant"/>
+            <column name="description" value="Décoration de mariage avec tables et chaises élégantes"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800"/>
+            <column name="alt_text" value="Décoration de mariage élégante"/>
+            <column name="category" value="Mariage"/>
+            <column name="sort_order" valueNumeric="1"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="true"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <insert tableName="gallery">
+            <column name="title" value="Événement Corporatif"/>
+            <column name="description" value="Installation pour événement d'entreprise professionnel"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1511578314322-379afb476865?w=800"/>
+            <column name="alt_text" value="Événement corporatif"/>
+            <column name="category" value="Corporatif"/>
+            <column name="sort_order" valueNumeric="2"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="true"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <insert tableName="gallery">
+            <column name="title" value="Fête de Naissance"/>
+            <column name="description" value="Décoration colorée pour fête de naissance"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1464207687429-7505649dae38?w=800"/>
+            <column name="alt_text" value="Fête de naissance"/>
+            <column name="category" value="Naissance"/>
+            <column name="sort_order" valueNumeric="3"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="false"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <insert tableName="gallery">
+            <column name="title" value="Équipements Audio"/>
+            <column name="description" value="Système de son professionnel pour événements"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800"/>
+            <column name="alt_text" value="Équipements audio"/>
+            <column name="category" value="Équipements"/>
+            <column name="sort_order" valueNumeric="4"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="false"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <insert tableName="gallery">
+            <column name="title" value="Tables et Chaises"/>
+            <column name="description" value="Mobilier de qualité pour tous types d'événements"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800"/>
+            <column name="alt_text" value="Tables et chaises"/>
+            <column name="category" value="Mobilier"/>
+            <column name="sort_order" valueNumeric="5"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="false"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+
+        <insert tableName="gallery">
+            <column name="title" value="Décoration Florale"/>
+            <column name="description" value="Arrangements floraux élégants pour vos événements"/>
+            <column name="image_url" value="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800"/>
+            <column name="alt_text" value="Décoration florale"/>
+            <column name="category" value="Décoration"/>
+            <column name="sort_order" valueNumeric="6"/>
+            <column name="active" valueBoolean="true"/>
+            <column name="featured" valueBoolean="true"/>
+            <column name="created_at" valueDate="2025-01-01T00:00:00"/>
+            <column name="updated_at" valueDate="2025-01-01T00:00:00"/>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>
+

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+
+    <changeSet id="022-add-images-columns" author="admin">
+        <comment>Add images and primary_image_url columns to entities</comment>
+        
+        <!-- Ajouter les colonnes images et primary_image_url aux tables principales -->
+        <sql>
+            ALTER TABLE packs ADD COLUMN IF NOT EXISTS images TEXT;
+        </sql>
+        
+        <sql>
+            ALTER TABLE packs ADD COLUMN IF NOT EXISTS primary_image_url VARCHAR(500);
+        </sql>
+        
+        <sql>
+            ALTER TABLE materiels ADD COLUMN IF NOT EXISTS images TEXT;
+        </sql>
+        
+        <sql>
+            ALTER TABLE materiels ADD COLUMN IF NOT EXISTS primary_image_url VARCHAR(500);
+        </sql>
+        
+        <sql>
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS images TEXT;
+        </sql>
+        
+        <sql>
+            ALTER TABLE categories ADD COLUMN IF NOT EXISTS primary_image_url VARCHAR(500);
+        </sql>
+        
+    </changeSet>
+    
+    <changeSet id="022-1-cleanup-old-table" author="admin">
+        <comment>Clean up old product_images table if it exists</comment>
+        
+        <!-- Supprimer la table product_images si elle existe -->
+        <sql>
+            DROP TABLE IF EXISTS product_images CASCADE;
+        </sql>
+        
+    </changeSet>
+
+    <!-- Ajouter la colonne is_favorite aux tables packs et materiels -->
+    <changeSet id="023-add-is-favorite-column" author="admin">
+        <comment>Ajouter la colonne is_favorite aux tables packs et materiels</comment>
+        
+        <addColumn tableName="packs">
+            <column name="is_favorite" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <addColumn tableName="materiels">
+            <column name="is_favorite" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    
+
+</databaseChangeLog>

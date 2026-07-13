@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.17.xsd">
+
+    <changeSet id="019-create-product-images-table" author="admin">
+        <comment>Create product_images table for multiple images per product</comment>
+        
+        <!-- Créer la table product_images -->
+        <createTable tableName="product_images">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            
+            <column name="url" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="image_type" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="alt_text" type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+            
+            <column name="sort_order" type="INTEGER" defaultValue="0">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="is_primary" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="active" type="BOOLEAN" defaultValue="true">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+            
+            <!-- Colonnes pour les relations -->
+            <column name="materiel_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            
+            <column name="pack_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+            
+            <column name="categorie_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        
+        <!-- Créer les index pour améliorer les performances -->
+        <createIndex tableName="product_images" indexName="idx_product_images_materiel_id">
+            <column name="materiel_id"/>
+        </createIndex>
+        
+        <createIndex tableName="product_images" indexName="idx_product_images_pack_id">
+            <column name="pack_id"/>
+        </createIndex>
+        
+        <createIndex tableName="product_images" indexName="idx_product_images_categorie_id">
+            <column name="categorie_id"/>
+        </createIndex>
+        
+        <createIndex tableName="product_images" indexName="idx_product_images_primary">
+            <column name="is_primary"/>
+        </createIndex>
+        
+        <createIndex tableName="product_images" indexName="idx_product_images_active">
+            <column name="active"/>
+        </createIndex>
+        
+        <!-- Ajouter les contraintes de clés étrangères -->
+        <addForeignKeyConstraint 
+            baseTableName="product_images"
+            baseColumnNames="materiel_id"
+            constraintName="fk_product_images_materiel"
+            referencedTableName="materiels"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"/>
+            
+        <addForeignKeyConstraint 
+            baseTableName="product_images"
+            baseColumnNames="pack_id"
+            constraintName="fk_product_images_pack"
+            referencedTableName="packs"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"/>
+            
+        <addForeignKeyConstraint 
+            baseTableName="product_images"
+            baseColumnNames="categorie_id"
+            constraintName="fk_product_images_categorie"
+            referencedTableName="categories"
+            referencedColumnNames="id"
+            onDelete="CASCADE"
+            onUpdate="CASCADE"/>
+        
+        <!-- Contrainte de vérification pour s'assurer qu'une image est associée à un seul produit -->
+        <sql>
+            ALTER TABLE product_images 
+            ADD CONSTRAINT chk_product_images_single_association 
+            CHECK (
+                (materiel_id IS NOT NULL AND pack_id IS NULL AND categorie_id IS NULL) OR
+                (materiel_id IS NULL AND pack_id IS NOT NULL AND categorie_id IS NULL) OR
+                (materiel_id IS NULL AND pack_id IS NULL AND categorie_id IS NOT NULL)
+            );
+        </sql>
+        
+        <!-- Contrainte de vérification pour le type d'image -->
+        <sql>
+            ALTER TABLE product_images 
+            ADD CONSTRAINT chk_product_images_type 
+            CHECK (image_type IN ('UPLOAD', 'URL'));
+        </sql>
+        
+        <!-- Migrer les images existantes vers la nouvelle table -->
+        <sql>
+            INSERT INTO product_images (url, image_type, alt_text, sort_order, is_primary, active, materiel_id, created_at, updated_at)
+            SELECT 
+                image_url,
+                'URL',
+                name || ' - Image principale',
+                0,
+                true,
+                true,
+                id,
+                COALESCE(created_at, NOW()),
+                COALESCE(updated_at, NOW())
+            FROM materiels 
+            WHERE image_url IS NOT NULL AND image_url != '';
+        </sql>
+        
+        <sql>
+            INSERT INTO product_images (url, image_type, alt_text, sort_order, is_primary, active, pack_id, created_at, updated_at)
+            SELECT 
+                image_url,
+                'URL',
+                name || ' - Image principale',
+                0,
+                true,
+                true,
+                id,
+                COALESCE(created_at, NOW()),
+                COALESCE(updated_at, NOW())
+            FROM packs 
+            WHERE image_url IS NOT NULL AND image_url != '';
+        </sql>
+        
+        <sql>
+            INSERT INTO product_images (url, image_type, alt_text, sort_order, is_primary, active, categorie_id, created_at, updated_at)
+            SELECT 
+                image_url,
+                'URL',
+                name || ' - Image de catégorie',
+                0,
+                true,
+                true,
+                id,
+                COALESCE(created_at, NOW()),
+                COALESCE(updated_at, NOW())
+            FROM categories 
+            WHERE image_url IS NOT NULL AND image_url != '';
+        </sql>
+        
+    </changeSet>
+    
+    <changeSet id="019-1-remove-old-image-columns" author="admin">
+        <comment>Remove old image_url columns after migration</comment>
+        
+        <!-- Supprimer les colonnes image_url des tables existantes -->
+        <dropColumn tableName="materiels" columnName="image_url"/>
+        <dropColumn tableName="packs" columnName="image_url"/>
+        <dropColumn tableName="categories" columnName="image_url"/>
+        
+    </changeSet>
+
+</databaseChangeLog>

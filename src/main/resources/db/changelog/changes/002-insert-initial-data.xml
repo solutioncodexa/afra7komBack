@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="002-insert-roles" author="afra7kom">
+        <insert tableName="roles">
+            <column name="id" valueNumeric="1"/>
+            <column name="name" value="ADMIN"/>
+            <column name="description" value="Administrator with full system access"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="2"/>
+            <column name="name" value="MANAGER"/>
+            <column name="description" value="Manager with elevated privileges"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="3"/>
+            <column name="name" value="AGENT"/>
+            <column name="description" value="Agent with operational access"/>
+        </insert>
+        <insert tableName="roles">
+            <column name="id" valueNumeric="4"/>
+            <column name="name" value="CLIENT"/>
+            <column name="description" value="Client with basic access"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="002b-insert-permissions" author="afra7kom">
+        <!-- User Management Permissions -->
+        <insert tableName="permissions">
+            <column name="name" value="user:read"/>
+            <column name="description" value="Read user information"/>
+            <column name="resource" value="user"/>
+            <column name="action" value="read"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="user:create"/>
+            <column name="description" value="Create new users"/>
+            <column name="resource" value="user"/>
+            <column name="action" value="create"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="user:update"/>
+            <column name="description" value="Update user information"/>
+            <column name="resource" value="user"/>
+            <column name="action" value="update"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="user:delete"/>
+            <column name="description" value="Delete users"/>
+            <column name="resource" value="user"/>
+            <column name="action" value="delete"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="user:manage_roles"/>
+            <column name="description" value="Manage user roles"/>
+            <column name="resource" value="user"/>
+            <column name="action" value="manage_roles"/>
+        </insert>
+
+        <!-- Pack Management Permissions -->
+        <insert tableName="permissions">
+            <column name="name" value="pack:read"/>
+            <column name="description" value="Read pack information"/>
+            <column name="resource" value="pack"/>
+            <column name="action" value="read"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="pack:create"/>
+            <column name="description" value="Create new packs"/>
+            <column name="resource" value="pack"/>
+            <column name="action" value="create"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="pack:update"/>
+            <column name="description" value="Update pack information"/>
+            <column name="resource" value="pack"/>
+            <column name="action" value="update"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="pack:delete"/>
+            <column name="description" value="Delete packs"/>
+            <column name="resource" value="pack"/>
+            <column name="action" value="delete"/>
+        </insert>
+
+        <!-- Material Management Permissions -->
+        <insert tableName="permissions">
+            <column name="name" value="material:read"/>
+            <column name="description" value="Read material information"/>
+            <column name="resource" value="material"/>
+            <column name="action" value="read"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="material:create"/>
+            <column name="description" value="Create new materials"/>
+            <column name="resource" value="material"/>
+            <column name="action" value="create"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="material:update"/>
+            <column name="description" value="Update material information"/>
+            <column name="resource" value="material"/>
+            <column name="action" value="update"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="material:delete"/>
+            <column name="description" value="Delete materials"/>
+            <column name="resource" value="material"/>
+            <column name="action" value="delete"/>
+        </insert>
+
+        <!-- Reservation Management Permissions -->
+        <insert tableName="permissions">
+            <column name="name" value="reservation:read"/>
+            <column name="description" value="Read reservation information"/>
+            <column name="resource" value="reservation"/>
+            <column name="action" value="read"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="reservation:create"/>
+            <column name="description" value="Create new reservations"/>
+            <column name="resource" value="reservation"/>
+            <column name="action" value="create"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="reservation:update"/>
+            <column name="description" value="Update reservation information"/>
+            <column name="resource" value="reservation"/>
+            <column name="action" value="update"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="reservation:delete"/>
+            <column name="description" value="Delete reservations"/>
+            <column name="resource" value="reservation"/>
+            <column name="action" value="delete"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="reservation:approve"/>
+            <column name="description" value="Approve reservations"/>
+            <column name="resource" value="reservation"/>
+            <column name="action" value="approve"/>
+        </insert>
+
+        <!-- Audit & Reporting Permissions -->
+        <insert tableName="permissions">
+            <column name="name" value="audit:read"/>
+            <column name="description" value="Read audit logs"/>
+            <column name="resource" value="audit"/>
+            <column name="action" value="read"/>
+        </insert>
+        <insert tableName="permissions">
+            <column name="name" value="report:generate"/>
+            <column name="description" value="Generate reports"/>
+            <column name="resource" value="report"/>
+            <column name="action" value="generate"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="002c-assign-role-permissions" author="afra7kom">
+        <!-- ADMIN: All permissions -->
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT 1, p.id FROM permissions p;
+        </sql>
+
+        <!-- MANAGER: Most permissions except user management -->
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT 2, p.id FROM permissions p 
+            WHERE p.name NOT IN ('user:delete', 'user:manage_roles');
+        </sql>
+
+        <!-- AGENT: Basic operational permissions -->
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT 3, p.id FROM permissions p 
+            WHERE p.name IN (
+                'pack:read', 'material:read', 'material:update',
+                'reservation:read', 'reservation:create', 'reservation:update', 'reservation:approve'
+            );
+        </sql>
+
+        <!-- CLIENT: Basic read permissions -->
+        <sql>
+            INSERT INTO role_permissions (role_id, permission_id)
+            SELECT 4, p.id FROM permissions p 
+            WHERE p.name IN ('pack:read', 'material:read', 'reservation:create');
+        </sql>
+    </changeSet>
+
+    <changeSet id="002d-insert-default-users" author="afra7kom">
+        <!-- Admin User -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="1"/>
+            <column name="email" value="admin@afra7kom.com"/>
+            <column name="password_hash" value="$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."/> <!-- password: password -->
+            <column name="enabled" valueBoolean="true"/>
+            <column name="account_non_expired" valueBoolean="true"/>
+            <column name="account_non_locked" valueBoolean="true"/>
+            <column name="credentials_non_expired" valueBoolean="true"/>
+        </insert>
+
+        <!-- Manager User -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="2"/>
+            <column name="email" value="manager@afra7kom.com"/>
+            <column name="phone" value="+212600000001"/>
+            <column name="password_hash" value="$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."/> <!-- password: password -->
+            <column name="enabled" valueBoolean="true"/>
+            <column name="account_non_expired" valueBoolean="true"/>
+            <column name="account_non_locked" valueBoolean="true"/>
+            <column name="credentials_non_expired" valueBoolean="true"/>
+        </insert>
+
+        <!-- Agent User -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="3"/>
+            <column name="email" value="agent@afra7kom.com"/>
+            <column name="phone" value="+212600000002"/>
+            <column name="password_hash" value="$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."/> <!-- password: password -->
+            <column name="enabled" valueBoolean="true"/>
+            <column name="account_non_expired" valueBoolean="true"/>
+            <column name="account_non_locked" valueBoolean="true"/>
+            <column name="credentials_non_expired" valueBoolean="true"/>
+        </insert>
+
+        <!-- Test Client User -->
+        <insert tableName="users">
+            <column name="id" valueNumeric="4"/>
+            <column name="email" value="client@afra7kom.com"/>
+            <column name="phone" value="+212600000003"/>
+            <column name="password_hash" value="$2a$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2uheWG/igi."/> <!-- password: password -->
+            <column name="enabled" valueBoolean="true"/>
+            <column name="account_non_expired" valueBoolean="true"/>
+            <column name="account_non_locked" valueBoolean="true"/>
+            <column name="credentials_non_expired" valueBoolean="true"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="002e-assign-user-roles" author="afra7kom">
+        <!-- Assign roles to users -->
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="1"/>
+            <column name="role_id" valueNumeric="1"/> <!-- Admin -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="2"/>
+            <column name="role_id" valueNumeric="2"/> <!-- Manager -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="3"/>
+            <column name="role_id" valueNumeric="3"/> <!-- Agent -->
+        </insert>
+        <insert tableName="user_roles">
+            <column name="user_id" valueNumeric="4"/>
+            <column name="role_id" valueNumeric="4"/> <!-- Client -->
+        </insert>
+    </changeSet>
+
+    <changeSet id="002f-reset-sequences" author="afra7kom">
+        <!-- Reset sequences to avoid ID conflicts -->
+        <sql>
+            SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
+        </sql>
+        <sql>
+            SELECT setval('roles_id_seq', (SELECT MAX(id) FROM roles));
+        </sql>
+        <sql>
+            SELECT setval('permissions_id_seq', (SELECT MAX(id) FROM permissions));
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+
+

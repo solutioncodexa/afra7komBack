@@ -1,0 +1,150 @@
+spring:
+  application:
+    name: afra7kom-backend
+
+  profiles:
+    default: dev
+  
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20 # Connexions max simultanées
+      minimum-idle: 5 # Connexions minimum en attente
+      connection-timeout: 20000 # 20 secondes
+      idle-timeout: 300000 # 5 minutes
+      max-lifetime: 1200000 # 20 minutes
+      pool-name: Afra7komHikariPool
+      auto-commit: false # Performance gain (géré par Spring @Transactional)
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false # Désactiver pour performance (activer en debug seulement)
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: false
+        jdbc:
+          batch_size: 50 # Augmenté pour meilleures performances
+          fetch_size: 50
+        order_inserts: true
+        order_updates: true
+        batch_versioned_data: true
+        connection:
+          provider_disables_autocommit: true # Performance gain
+        query:
+          in_clause_parameter_padding: true # Optimisation IN queries
+        cache:
+          use_second_level_cache: false # Désactivé car on utilise Spring Cache
+          use_query_cache: false
+  
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+  
+  cache:
+    type: simple # Temporairement désactiver Redis
+    # redis:
+    #   time-to-live: 600000 # 10 minutes
+    #   cache-null-values: false
+  
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+      enabled: true
+
+  mail:
+    host: ${SPRING_MAIL_HOST:smtp.gmail.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SPRING_MAIL_USERNAME:}
+    password: ${SPRING_MAIL_PASSWORD:}
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          timeout: 5000
+          connectiontimeout: 5000
+          writetimeout: 5000
+    default-encoding: UTF-8
+
+# JWT Configuration
+jwt:
+  key-file: ${JWT_KEY_FILE:./config/jwt.key}
+  expiration: 86400000 # 24 hours
+  refresh-expiration: 604800000 # 7 days
+
+# WhatsApp Configuration (Twilio)
+twilio:
+  account-sid: ${TWILIO_ACCOUNT_SID:your-account-sid}
+  auth-token: ${TWILIO_AUTH_TOKEN:your-auth-token}
+  whatsapp-number: ${TWILIO_WHATSAPP_NUMBER:+1234567890}
+
+# Email Configuration
+app:
+  email:
+    admin: ${ADMIN_EMAIL:admin@afra7kom.com}
+    agent: ${AGENT_EMAIL:agent@afra7kom.com}
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:4200}
+  security:
+    debug-endpoints-enabled: ${DEBUG_ENDPOINTS_ENABLED:false}
+
+# File Upload Configuration
+file:
+  upload-dir: ./uploads/
+  max-size: -1 # illimité pour l'admin (compression côté serveur)
+  image:
+    compress: true
+    max-width: 1920
+    max-height: 1920
+    quality: 0.82
+
+# MinIO Object Storage
+minio:
+  enabled: ${MINIO_ENABLED:false}
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:afra7kom}
+  public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+
+# Security Configuration
+security:
+  cors:
+    allowed-origins: "http://localhost:4200,https://afra7kom.ma,https://www.afra7kom.ma"
+    allowed-methods: "GET,POST,PUT,DELETE,OPTIONS,PATCH,HEAD"
+    allowed-headers: "*"
+    allow-credentials: true
+    max-age: 3600
+
+# Server Configuration
+server:
+  port: 8080
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    mail:
+      enabled: true # Activer le health check email
+    redis:
+      enabled: false # Désactiver le health check redis
+
+# Logging Configuration
+logging:
+  level:
+    com.afra7kom.backend: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"

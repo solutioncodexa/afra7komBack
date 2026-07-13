@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="009-fix-packs-sequence" author="afra7kom">
+        <!-- Réinitialiser la séquence pour la table packs -->
+        <sql>
+            SELECT setval('packs_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM packs));
+        </sql>
+        
+        <!-- Réinitialiser la séquence pour la table pack_materiels -->
+        <sql>
+            SELECT setval('pack_materiels_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM pack_materiels));
+        </sql>
+        
+        <!-- Réinitialiser la séquence pour la table pack_images (si elle existe) -->
+        <sql>
+            SELECT setval('pack_images_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM pack_images)) WHERE EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'pack_images');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

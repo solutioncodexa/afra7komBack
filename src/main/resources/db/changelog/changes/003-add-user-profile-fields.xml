@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="003-add-user-profile-fields" author="afra7kom">
+        <comment>Ajouter les colonnes firstName et lastName à la table users</comment>
+        
+        <!-- Ajouter la colonne first_name -->
+        <addColumn tableName="users">
+            <column name="first_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter la colonne last_name -->
+        <addColumn tableName="users">
+            <column name="last_name" type="VARCHAR(100)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        
+        <!-- Ajouter des commentaires sur les colonnes -->
+        <sql>
+            COMMENT ON COLUMN users.first_name IS 'Prénom de l''utilisateur';
+            COMMENT ON COLUMN users.last_name IS 'Nom de famille de l''utilisateur';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>
+
+

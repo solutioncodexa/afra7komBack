@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="018-add-type-to-packs" author="admin">
+        <comment>Add type column to packs table</comment>
+        
+        <!-- Add type column to packs table -->
+        <addColumn tableName="packs">
+            <column name="type" type="VARCHAR(20)" defaultValue="PACK">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        
+        <!-- Update existing packs based on their content -->
+        <!-- Packs with materials = BUFFET -->
+        <update tableName="packs">
+            <column name="type" value="BUFFET"/>
+            <where>id IN (SELECT DISTINCT p.id FROM packs p INNER JOIN pack_materiels pm ON p.id = pm.pack_id WHERE pm.quantity > 0)</where>
+        </update>
+        
+    </changeSet>
+
+</databaseChangeLog>

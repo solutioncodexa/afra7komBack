@@ -1,0 +1,72 @@
+# Profil développement — base Neon (test) + SMTP Gmail
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://ep-divine-sunset-a2414kul-pooler.eu-central-1.aws.neon.tech:5432/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_lPz1YpCM2HxE
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+    enabled: true
+    contexts: dev
+
+  cache:
+    type: simple
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: noreply.codexa@gmail.com
+    password: "ggup qcfi rsqj ozyl"
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+minio:
+  enabled: ${MINIO_ENABLED:true}
+  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
+  bucket: ${MINIO_BUCKET:afra7kom}
+  public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+
+app:
+  security:
+    debug-endpoints-enabled: true
+
+security:
+  cors:
+    allowed-origins: "http://localhost:4200,http://127.0.0.1:4200,https://afra7kom.ma,https://www.afra7kom.ma"
+
+management:
+  health:
+    mail:
+      enabled: false
+
+logging:
+  level:
+    com.afra7kom.backend: DEBUG
+    org.springframework.security: INFO

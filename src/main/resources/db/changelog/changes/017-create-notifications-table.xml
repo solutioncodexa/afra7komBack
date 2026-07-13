@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.4.xsd">
+
+    <changeSet id="017-create-notifications-table" author="afra7kom">
+        <createTable tableName="notifications">
+            <column name="id" type="BIGSERIAL" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="message" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)" defaultValue="UNREAD">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT"/>
+            <column name="reservation_id" type="BIGINT"/>
+            <column name="related_entity_type" type="VARCHAR(50)"/>
+            <column name="related_entity_id" type="BIGINT"/>
+            <column name="created_at" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="read_at" type="TIMESTAMP"/>
+            <column name="expires_at" type="TIMESTAMP"/>
+        </createTable>
+
+        <!-- Index pour améliorer les performances -->
+        <createIndex tableName="notifications" indexName="idx_notifications_user_id">
+            <column name="user_id"/>
+        </createIndex>
+
+        <createIndex tableName="notifications" indexName="idx_notifications_status">
+            <column name="status"/>
+        </createIndex>
+
+        <createIndex tableName="notifications" indexName="idx_notifications_created_at">
+            <column name="created_at"/>
+        </createIndex>
+
+        <createIndex tableName="notifications" indexName="idx_notifications_reservation_id">
+            <column name="reservation_id"/>
+        </createIndex>
+
+        <!-- Clés étrangères -->
+        <addForeignKeyConstraint baseTableName="notifications" baseColumnNames="user_id"
+                                constraintName="fk_notifications_user"
+                                referencedTableName="users" referencedColumnNames="id"
+                                onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="notifications" baseColumnNames="reservation_id"
+                                constraintName="fk_notifications_reservation"
+                                referencedTableName="reservations" referencedColumnNames="id"
+                                onDelete="CASCADE"/>
+    </changeSet>
+
+</databaseChangeLog>
+

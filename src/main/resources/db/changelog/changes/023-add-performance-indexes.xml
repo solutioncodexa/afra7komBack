@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="023-add-performance-indexes" author="system">
+        <comment>Ajout d'index pour optimiser les performances des APIs de disponibilité et get items</comment>
+
+        <!-- Index pour les réservations - Optimisation des requêtes de disponibilité -->
+        
+        <!-- Index composite pour les réservations par pack et statut -->
+        <createIndex tableName="reservations" indexName="idx_reservations_pack_status_startdate">
+            <column name="pack_id"/>
+            <column name="status"/>
+            <column name="start_date"/>
+        </createIndex>
+
+        <!-- Index composite pour les réservations par matériel et statut -->
+        <createIndex tableName="reservations" indexName="idx_reservations_materiel_status_startdate">
+            <column name="materiel_id"/>
+            <column name="status"/>
+            <column name="start_date"/>
+        </createIndex>
+
+        <!-- Index pour les dates de réservation (chevauchement) -->
+        <createIndex tableName="reservations" indexName="idx_reservations_dates_status">
+            <column name="start_date"/>
+            <column name="end_date"/>
+            <column name="status"/>
+        </createIndex>
+
+        <!-- Index pour les réservations par utilisateur -->
+        <createIndex tableName="reservations" indexName="idx_reservations_user_created">
+            <column name="user_id"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Index pour les réservations par statut -->
+        <createIndex tableName="reservations" indexName="idx_reservations_status_created">
+            <column name="status"/>
+            <column name="created_at"/>
+        </createIndex>
+
+        <!-- Index pour les packs - Optimisation des requêtes get items -->
+        
+        <!-- Index pour les packs actifs -->
+        <createIndex tableName="packs" indexName="idx_packs_active_categorie">
+            <column name="active"/>
+            <column name="categorie_id"/>
+        </createIndex>
+
+        <!-- Index pour la recherche de packs -->
+        <createIndex tableName="packs" indexName="idx_packs_name_search">
+            <column name="name"/>
+        </createIndex>
+
+        <!-- Index pour les packs par type -->
+        <createIndex tableName="packs" indexName="idx_packs_type_active">
+            <column name="type"/>
+            <column name="active"/>
+        </createIndex>
+
+        <!-- Index pour les matériels - Optimisation des requêtes get items -->
+        
+        <!-- Index pour les matériels actifs -->
+        <createIndex tableName="materiels" indexName="idx_materiels_active_categorie">
+            <column name="active"/>
+            <column name="categorie_id"/>
+        </createIndex>
+
+        <!-- Index pour la recherche de matériels -->
+        <createIndex tableName="materiels" indexName="idx_materiels_name_search">
+            <column name="name"/>
+        </createIndex>
+
+        <!-- Index pour les matériels par disponibilité -->
+        <createIndex tableName="materiels" indexName="idx_materiels_availability">
+            <column name="available_quantity"/>
+            <column name="total_quantity"/>
+        </createIndex>
+
+        <!-- Index pour les relations pack-materiel -->
+        
+        <!-- Index pour les relations pack-materiel par matériel -->
+        <createIndex tableName="pack_materiels" indexName="idx_pack_materiels_materiel">
+            <column name="materiel_id"/>
+        </createIndex>
+
+        <!-- Index pour les relations pack-materiel par pack -->
+        <createIndex tableName="pack_materiels" indexName="idx_pack_materiels_pack">
+            <column name="pack_id"/>
+        </createIndex>
+
+        <!-- Index pour les relations pack-materiel optionnelles -->
+        <createIndex tableName="pack_materiels" indexName="idx_pack_materiels_optional">
+            <column name="is_optional"/>
+        </createIndex>
+
+        <!-- Index pour les items de réservation -->
+
+
+        <!-- Index pour les catégories -->
+        
+        <!-- Index pour les catégories actives -->
+        <createIndex tableName="categories" indexName="idx_categories_active_sort">
+            <column name="active"/>
+            <column name="sort_order"/>
+            <column name="name"/>
+        </createIndex>
+
+    </changeSet>
+
+</databaseChangeLog>
+
