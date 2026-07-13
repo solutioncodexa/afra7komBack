@@ -12,6 +12,8 @@ public class SiteSettingsDto {
     private SocialDto social;
     private ThemeDto theme;
     private HomepageDto homepage;
+    private CatalogDto catalog;
+    private ReservationDto reservation;
 
     @Data
     public static class CompanyDto {
@@ -68,5 +70,28 @@ public class SiteSettingsDto {
         /** Image section à propos — Réalisation 2 */
         private String aboutImageUrl = "";
         private String aboutImageAlt = "Salle de réception marocaine décorée";
+    }
+
+    @Data
+    public static class CatalogDto {
+        private String heroTitle = "Buffet de";
+        private String heroHighlight = "Fête";
+        private String heroDescription = "Packs, buffets, gâteaux et matériel premium pour vos mariages, fiançailles et célébrations — réservez en ligne en quelques clics.";
+        private String statQualityValue = "100%";
+        private String statQualityLabel = "Qualité";
+        private String statSupportValue = "24/7";
+        private String statSupportLabel = "Support";
+    }
+
+    @Data
+    public static class ReservationDto {
+        private String bookingTitle = "Composez votre événement";
+        private String deliveryNotice = "Les frais de livraison ne sont pas inclus dans le prix affiché.";
+        private String featureTagDelivery = "Livraison incluse";
+        private String featureTagInstallation = "Installation";
+        private String featureTagPickup = "Reprise sur place";
+        private String whatsappHelpPrefix = "Besoin d'aide ?";
+        private String whatsappHelpLinkLabel = "Contactez-nous sur WhatsApp";
+        private String stockOutMessage = "Ce matériel est en rupture de stock (0 unité disponible). Les dates apparaissent grisées car aucune réservation n'est possible pour le moment.";
     }
 }

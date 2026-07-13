@@ -168,7 +168,36 @@ public class SiteSettingsService {
                 if (src.getAboutImageAlt() != null) dest.setAboutImageAlt(src.getAboutImageAlt());
             }
         }
+        if (incoming.getCatalog() != null) {
+            defaults.setCatalog(mergeCatalog(defaults.getCatalog(), incoming.getCatalog()));
+        }
+        if (incoming.getReservation() != null) {
+            defaults.setReservation(mergeReservation(defaults.getReservation(), incoming.getReservation()));
+        }
         return defaults;
+    }
+
+    private SiteSettingsDto.CatalogDto mergeCatalog(SiteSettingsDto.CatalogDto dest, SiteSettingsDto.CatalogDto src) {
+        if (src.getHeroTitle() != null) dest.setHeroTitle(src.getHeroTitle());
+        if (src.getHeroHighlight() != null) dest.setHeroHighlight(src.getHeroHighlight());
+        if (src.getHeroDescription() != null) dest.setHeroDescription(src.getHeroDescription());
+        if (src.getStatQualityValue() != null) dest.setStatQualityValue(src.getStatQualityValue());
+        if (src.getStatQualityLabel() != null) dest.setStatQualityLabel(src.getStatQualityLabel());
+        if (src.getStatSupportValue() != null) dest.setStatSupportValue(src.getStatSupportValue());
+        if (src.getStatSupportLabel() != null) dest.setStatSupportLabel(src.getStatSupportLabel());
+        return dest;
+    }
+
+    private SiteSettingsDto.ReservationDto mergeReservation(SiteSettingsDto.ReservationDto dest, SiteSettingsDto.ReservationDto src) {
+        if (src.getBookingTitle() != null) dest.setBookingTitle(src.getBookingTitle());
+        if (src.getDeliveryNotice() != null) dest.setDeliveryNotice(src.getDeliveryNotice());
+        if (src.getFeatureTagDelivery() != null) dest.setFeatureTagDelivery(src.getFeatureTagDelivery());
+        if (src.getFeatureTagInstallation() != null) dest.setFeatureTagInstallation(src.getFeatureTagInstallation());
+        if (src.getFeatureTagPickup() != null) dest.setFeatureTagPickup(src.getFeatureTagPickup());
+        if (src.getWhatsappHelpPrefix() != null) dest.setWhatsappHelpPrefix(src.getWhatsappHelpPrefix());
+        if (src.getWhatsappHelpLinkLabel() != null) dest.setWhatsappHelpLinkLabel(src.getWhatsappHelpLinkLabel());
+        if (src.getStockOutMessage() != null) dest.setStockOutMessage(src.getStockOutMessage());
+        return dest;
     }
 
     private SiteSettingsDto createDefaultSettings() {
@@ -234,6 +263,9 @@ public class SiteSettingsService {
         homepage.setDisplayCounts(displayCounts);
         homepage.setRealisations(new SiteSettingsDto.RealisationsDto());
         dto.setHomepage(homepage);
+
+        dto.setCatalog(new SiteSettingsDto.CatalogDto());
+        dto.setReservation(new SiteSettingsDto.ReservationDto());
 
         return dto;
     }
