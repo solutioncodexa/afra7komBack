@@ -1,19 +1,22 @@
 FROM eclipse-temurin:17-jre-alpine
 
-RUN addgroup -S afra7kom && adduser -S afra7kom -G afra7kom
+RUN apk add --no-cache su-exec \
+    && addgroup -S afra7kom \
+    && adduser -S afra7kom -G afra7kom
 
 WORKDIR /app
 
-RUN mkdir -p /app/uploads /app/logs /app/config && chown -R afra7kom:afra7kom /app
+RUN mkdir -p /app/uploads /app/logs /app/config
 
 COPY app.jar app.jar
-RUN chown afra7kom:afra7kom app.jar
-
-USER afra7kom
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh \
+    && chown -R afra7kom:afra7kom /app
 
 EXPOSE 8080
 
 ENV SPRING_PROFILES_ACTIVE=prod
 ENV SERVER_PORT=8080
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS:--Xms512m -Xmx1536m} -jar app.jar"]
+# Root au démarrage pour chown des volumes montés, puis su-exec vers afra7kom
+ENTRYPOINT ["/docker-entrypoint.sh"]

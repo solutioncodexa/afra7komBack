@@ -5,6 +5,11 @@ cd ~/afra7kom
 
 echo "=== Deploy backend $(date -Iseconds) ==="
 
+# Permissions volumes hôte (évite Permission denied sur logs/)
+sudo mkdir -p logs uploads
+sudo chown -R "$(id -u)":"$(id -g)" logs uploads 2>/dev/null || true
+chmod -R u+rwX logs uploads 2>/dev/null || true
+
 if [ -f docker-compose.minio.yml ]; then
   docker compose -f docker-compose.minio.yml --env-file env.prod up -d
 fi
