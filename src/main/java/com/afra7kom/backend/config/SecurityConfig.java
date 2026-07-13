@@ -6,6 +6,7 @@ import com.afra7kom.backend.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -36,7 +37,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final boolean debugEndpointsEnabled;
 
-    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, 
+    public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                          JwtTokenProvider jwtTokenProvider,
                          @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
                          @Value("${app.security.debug-endpoints-enabled:false}") boolean debugEndpointsEnabled) {
@@ -69,21 +70,41 @@ public class SecurityConfig {
         return authProvider;
     }
 
+    /**
+     * Chaîne dédiée aux APIs publiques — sans JWT, sans 401.
+     * Priorité haute pour éviter que la chaîne principale bloque gallery/site-settings.
+     */
     @Bean
+    @Order(1)
+    public SecurityFilterChain publicApiFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher(
+                "/api/public/**",
+                "/public/**",
+                "/api/health",
+                "/actuator/health",
+                "/uploads/**",
+                "/error"
+            )
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .authorizeHttpRequests(authz -> authz.anyRequest().permitAll());
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(2)
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors().and().csrf().disable()
-            .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-            .and()
-            .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            .and()
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+            .csrf(csrf -> csrf.disable())
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> {
                 authz.requestMatchers("/auth/**", "/api/auth/**").permitAll()
-                .requestMatchers("/public/**", "/api/public/**").permitAll()
-                .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/api/health", "/api/public/health").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-                .requestMatchers("/error").permitAll();
+                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
 
                 if (debugEndpointsEnabled) {
                     authz.requestMatchers("/api/test/**").hasRole("ADMIN")
@@ -104,33 +125,23 @@ public class SecurityConfig {
                 }
 
                 authz.requestMatchers("/api/admin/public-test").denyAll()
-                
-                // Permettre l'accès public aux images uploadées
-                .requestMatchers("/uploads/**").permitAll()
-                
-                // WebSocket endpoints - permettre l'accès sans authentification pour les tests
-                .requestMatchers("/ws/**").permitAll()
-                .requestMatchers("/ws/info").permitAll()
-                
-                // Endpoints publics pour le site web (GET seulement)
+                .requestMatchers("/ws/**", "/ws/info").permitAll()
+
+                // GET publics catalogue / packs / matériels
                 .requestMatchers(HttpMethod.GET, "/api/packs/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/pack-details/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/materiels/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
-                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reservations/public/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/public/gallery/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/availability/**").permitAll()
-                
-                // Endpoints de réservation pour invités (POST pour créer, GET pour vérifier)
+
+                // Réservations / contacts invités
                 .requestMatchers(HttpMethod.POST, "/api/reservations").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/reservations/check-availability").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/reservations/{id}").permitAll()
-                
-                // Endpoint de contact public (POST pour créer)
                 .requestMatchers(HttpMethod.POST, "/api/contacts").permitAll()
-                
+
                 .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "AGENT")
                 .requestMatchers("/api/gallery/**").hasAnyRole("ADMIN", "MANAGER", "AGENT")
                 .requestMatchers("/api/manager/**").hasAnyRole("ADMIN", "MANAGER")
@@ -147,26 +158,20 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
-        // Autoriser toutes les origines temporairement pour le développement
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"
         ));
-        
         configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization", "Content-Type", "X-Requested-With", 
-            "Accept", "Origin", "Access-Control-Request-Method", 
+            "Authorization", "Content-Type", "X-Requested-With",
+            "Accept", "Origin", "Access-Control-Request-Method",
             "Access-Control-Request-Headers", "Cache-Control",
             "Content-Disposition", "Content-Length"
         ));
-        
         configuration.setExposedHeaders(Arrays.asList(
             "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
         ));
-        
-        configuration.setAllowCredentials(false); // Désactivé temporairement pour permettre *
+        configuration.setAllowCredentials(false);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
