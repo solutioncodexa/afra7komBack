@@ -26,6 +26,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.http.HttpMethod;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 @EnableWebSecurity
@@ -36,15 +38,21 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserDetailsService userDetailsService;
     private final boolean debugEndpointsEnabled;
+    private final List<String> corsAllowedOrigins;
 
     public SecurityConfig(JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
                          JwtTokenProvider jwtTokenProvider,
                          @Qualifier("customUserDetailsService") UserDetailsService userDetailsService,
-                         @Value("${app.security.debug-endpoints-enabled:false}") boolean debugEndpointsEnabled) {
+                         @Value("${app.security.debug-endpoints-enabled:false}") boolean debugEndpointsEnabled,
+                         @Value("${security.cors.allowed-origins:https://afra7kom.ma,https://www.afra7kom.ma,http://localhost:4200}") String corsAllowedOrigins) {
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;
         this.debugEndpointsEnabled = debugEndpointsEnabled;
+        this.corsAllowedOrigins = Arrays.stream(corsAllowedOrigins.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
     }
 
     @Bean
@@ -155,23 +163,22 @@ public class SecurityConfig {
         return http.build();
     }
 
+    /**
+     * Source CORS unique (ne pas aussi déclarer CORS dans WebMvc — sinon ACAO dupliqué
+     * ex. {@code https://afra7kom.ma,https://afra7kom.ma} → erreur CORS navigateur).
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        configuration.setAllowedOrigins(corsAllowedOrigins);
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH", "HEAD"
         ));
-        configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization", "Content-Type", "X-Requested-With",
-            "Accept", "Origin", "Access-Control-Request-Method",
-            "Access-Control-Request-Headers", "Cache-Control",
-            "Content-Disposition", "Content-Length"
-        ));
+        configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(Arrays.asList(
-            "Access-Control-Allow-Origin", "Access-Control-Allow-Credentials"
+            "Authorization", "Content-Disposition", "Content-Type"
         ));
-        configuration.setAllowCredentials(false);
+        configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
