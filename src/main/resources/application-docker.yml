@@ -101,7 +101,8 @@ minio:
   access-key: ${MINIO_ACCESS_KEY:minioadmin}
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket: ${MINIO_BUCKET:afra7kom}
-  public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+  public-url: ${MINIO_PUBLIC_URL:https://api.afra7kom.ma}
+  fallback-local: ${MINIO_FALLBACK_LOCAL:false}
 
 # Server Configuration
 server:

@@ -10,8 +10,24 @@ sudo mkdir -p logs uploads
 sudo chown -R "$(id -u)":"$(id -g)" logs uploads 2>/dev/null || true
 chmod -R u+rwX logs uploads 2>/dev/null || true
 
+# Copier compose MinIO depuis artifacts CI si présent
+if [ -f ~/afra7kom/afra7kombackend/deploy/docker-compose.minio.yml ]; then
+  cp ~/afra7kom/afra7kombackend/deploy/docker-compose.minio.yml ~/afra7kom/docker-compose.minio.yml
+fi
+
+if [ ! -f env.prod ]; then
+  echo "WARN: env.prod manquant — copiez deploy/env.prod.example et renseignez MINIO_*"
+fi
+
+# MinIO obligatoire en prod
 if [ -f docker-compose.minio.yml ]; then
+  echo "=== Démarrage MinIO ==="
   docker compose -f docker-compose.minio.yml --env-file env.prod up -d
+  sleep 3
+  docker ps --filter name=afra7kom-minio --format '{{.Names}} {{.Status}}' || true
+else
+  echo "ERREUR: docker-compose.minio.yml absent — images MinIO non disponibles"
+  exit 1
 fi
 
 docker compose -f docker-compose.backend-only.yml --env-file env.prod up -d --build backend
@@ -19,4 +35,4 @@ docker compose -f docker-compose.backend-only.yml --env-file env.prod up -d --bu
 echo "=== Health check ==="
 sleep 10
 curl -sf http://localhost:8080/actuator/health || echo "Backend pas encore prêt"
-docker logs afra7kom-backend --tail 30
+docker logs afra7kom-backend --tail 40

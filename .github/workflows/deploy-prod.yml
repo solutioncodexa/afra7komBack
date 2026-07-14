@@ -26,7 +26,7 @@ jobs:
       - name: Prepare runtime artifacts
         run: |
           cp target/afra7kom-backend-*.jar app.jar
-          chmod +x deploy/deploy-backend.sh docker-entrypoint.sh
+          chmod +x deploy/deploy-backend.sh docker-entrypoint.sh deploy/migrate-uploads-to-minio.sh
 
       - name: Upload to VPS
         uses: appleboy/scp-action@v0.1.7
@@ -34,7 +34,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "app.jar,Dockerfile.runtime,docker-entrypoint.sh,deploy/deploy-backend.sh"
+          source: "app.jar,Dockerfile.runtime,docker-entrypoint.sh,deploy/deploy-backend.sh,deploy/docker-compose.minio.yml,deploy/env.prod.example,deploy/migrate-uploads-to-minio.sh"
           target: "/home/debian/afra7kom/afra7kombackend"
 
       - name: Deploy on VPS

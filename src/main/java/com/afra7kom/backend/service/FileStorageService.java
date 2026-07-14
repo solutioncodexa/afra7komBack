@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.Set;
 import java.util.UUID;
 
@@ -58,6 +57,10 @@ public class FileStorageService {
 
     /**
      * Stocke une image (compression automatique) et retourne l'URL publique à enregistrer en base.
+     * <ul>
+     *   <li>MinIO : {@code {publicUrl}/{bucket}/{folder}/{uuid}.jpg}</li>
+     *   <li>Local  : {@code /uploads/{folder}/{uuid}.jpg}</li>
+     * </ul>
      */
     public String storeImage(MultipartFile file, String folder) throws IOException {
         validateImage(file);
@@ -66,14 +69,24 @@ public class FileStorageService {
         String objectName = buildObjectName(folder, "jpg");
         String contentType = compressImages ? "image/jpeg" : resolveContentType(file);
 
-        if (minioProperties.isEnabled() && minioClient != null) {
+        if (minioProperties.isEnabled()) {
+            if (minioClient == null) {
+                if (!minioProperties.isFallbackLocal()) {
+                    throw new IOException("MinIO activé mais client non initialisé");
+                }
+                log.warn("MinIO activé sans client — fallback local");
+                return uploadLocally(processed, objectName);
+            }
             try {
                 return uploadToMinio(processed, objectName, contentType);
             } catch (Exception e) {
+                if (!minioProperties.isFallbackLocal()) {
+                    throw new IOException("Échec upload MinIO (fallback local désactivé): " + e.getMessage(), e);
+                }
                 log.warn("MinIO indisponible, stockage local utilisé: {}", e.getMessage());
             }
         }
-        return uploadLocally(processed, folder, objectName, contentType);
+        return uploadLocally(processed, objectName);
     }
 
     private void validateImage(MultipartFile file) {
@@ -118,15 +131,18 @@ public class FileStorageService {
                             .build()
             );
 
+            // URL publique via nginx: https://api.afra7kom.ma/afra7kom/images/....jpg
             String baseUrl = minioProperties.getPublicUrl().replaceAll("/$", "");
-            return baseUrl + "/" + minioProperties.getBucket() + "/" + objectName;
+            String url = baseUrl + "/" + minioProperties.getBucket() + "/" + objectName;
+            log.info("Image stockée sur MinIO: {}", url);
+            return url;
         } catch (Exception e) {
             log.error("Erreur upload MinIO: {}", e.getMessage());
             throw new IOException("Erreur lors de l'upload vers MinIO", e);
         }
     }
 
-    private String uploadLocally(byte[] data, String folder, String objectName, String contentType) throws IOException {
+    private String uploadLocally(byte[] data, String objectName) throws IOException {
         Path target = Paths.get(uploadDir).resolve(objectName).toAbsolutePath().normalize();
         Files.createDirectories(target.getParent());
         Files.write(target, data);

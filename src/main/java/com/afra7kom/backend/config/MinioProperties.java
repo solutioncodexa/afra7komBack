@@ -15,5 +15,8 @@ public class MinioProperties {
     private String accessKey = "minioadmin";
     private String secretKey = "minioadmin";
     private String bucket = "afra7kom";
+    /** Base publique (ex. https://api.afra7kom.ma) — nginx proxifie /{bucket}/ vers MinIO */
     private String publicUrl = "http://localhost:9000";
+    /** Si true, en cas d'échec MinIO on écrit sur disque (/uploads). En prod: false. */
+    private boolean fallbackLocal = true;
 }

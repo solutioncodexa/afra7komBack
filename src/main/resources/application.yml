@@ -112,6 +112,7 @@ minio:
   secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket: ${MINIO_BUCKET:afra7kom}
   public-url: ${MINIO_PUBLIC_URL:http://localhost:9000}
+  fallback-local: ${MINIO_FALLBACK_LOCAL:true}
 
 # Security Configuration
 security:

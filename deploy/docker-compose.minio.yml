@@ -1,0 +1,37 @@
+# MinIO pour Afra7kom (prod / VPS)
+# Usage: docker compose -f docker-compose.minio.yml --env-file env.prod up -d
+#
+# Le backend doit partager le réseau docker (souvent déjà créé par nginx/compose unifié).
+# Réseau par défaut: afra7kom_default — adaptez si besoin.
+
+services:
+  minio:
+    image: minio/minio:RELEASE.2024-12-18T13-15-44Z
+    container_name: afra7kom-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+    # Pas d'exposition publique directe en prod : accès via nginx → api.afra7kom.ma/afra7kom/
+    expose:
+      - "9000"
+      - "9001"
+    networks:
+      - afra7kom_net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  minio_data:
+
+networks:
+  afra7kom_net:
+    name: afra7kom_default
+    external: true

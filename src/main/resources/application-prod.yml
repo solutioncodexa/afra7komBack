@@ -64,12 +64,14 @@ file:
   upload-dir: ./uploads/
 
 minio:
-  enabled: ${MINIO_ENABLED:false}
-  endpoint: ${MINIO_ENDPOINT:http://localhost:9000}
-  access-key: ${MINIO_ACCESS_KEY:}
-  secret-key: ${MINIO_SECRET_KEY:}
+  enabled: ${MINIO_ENABLED:true}
+  endpoint: ${MINIO_ENDPOINT:http://minio:9000}
+  access-key: ${MINIO_ACCESS_KEY:minioadmin}
+  secret-key: ${MINIO_SECRET_KEY:minioadmin}
   bucket: ${MINIO_BUCKET:afra7kom}
   public-url: ${MINIO_PUBLIC_URL:https://api.afra7kom.ma}
+  # En prod MinIO est obligatoire : pas de fallback disque silencieux
+  fallback-local: ${MINIO_FALLBACK_LOCAL:false}
 
 app:
   security:
